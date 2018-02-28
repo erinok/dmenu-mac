@@ -1,6 +1,8 @@
 
 # dmenu-mac
 
+[![Build Status](https://travis-ci.org/fr0zn/dmenu-mac.svg?branch=master)](https://travis-ci.org/fr0zn/dmenu-mac)
+
 dmenu inspired application launcher.
 
 ![dmenu-mac demo](https://im.ezgif.com/tmp/ezgif-1-318ea85acf.gif)
@@ -66,8 +68,6 @@ NOTE: the releases are not signed yet, use it at your own risk. I'll take care o
 # Pull requests
 Any improvement/bugfix is welcome.
 
-[![travis-ci](https://travis-ci.org/oNaiPs/dmenu-mac.png)](https://travis-ci.org/oNaiPs/dmenu-mac)
-
 # Authors
 
-[@onaips](https://twitter.com/onaips)
+[@onaips](https://twitter.com/onaips), [@fr0zn](https://twitter.com/e0d1n)
