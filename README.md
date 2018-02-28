@@ -45,7 +45,7 @@ White-Purple-Gray:
 
 ## Download
 
-You can download it [here](https://github.com/oNaiPs/dmenu-mac/releases).
+You can download the latest release [here](https://github.com/fr0zn/dmenu-mac/releases/latest).
 
 NOTE: the releases are not signed yet, use it at your own risk. I'll take care of that as soon as we can assess the number of people interested in the project.
 
