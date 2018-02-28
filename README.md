@@ -3,7 +3,7 @@
 
 dmenu inspired application launcher.
 
-![dmenu-mac demo](https://media.giphy.com/media/ETW9mmSJAh2yA/giphy.gif)
+![dmenu-mac demo](https://im.ezgif.com/tmp/ezgif-1-318ea85acf.gif)
 
 ## Who is it for
 Anyone that needs a quick and intuitive keyboard-only application launcher that does not rely on spotlight indexing.
@@ -18,6 +18,30 @@ If you are like me and have a shit-ton of files on your computer, and spotlight 
 1. Open the app, use cmd-Space to bring it to front.
 2. Optionally, you can change the binding by clicking the ... on the right of the menu.
 3. Type the application you want to open, hit enter to run the one selected.
+
+## Examples
+
+You can customize the colors
+
+Default:
+
+![example1](https://imgur.com/jwYZZBS.png)
+
+Blue:
+
+![example2](https://imgur.com/6H36HXd.png)
+
+White-Blue:
+
+![example3](https://imgur.com/P4kjEbS.png)
+
+Purple-Gray:
+
+![example3](https://imgur.com/FbkwMoc.png)
+
+White-Purple-Gray:
+
+![example3](https://imgur.com/pfuzxDl.png)
 
 ## Download
 
