@@ -49,14 +49,11 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         configureGlobalShortcut()
     }
 	
-	private let eventCallback: FSEventStreamCallback = { (stream: ConstFSEventStreamRef,
-		contextInfo: UnsafeMutableRawPointer?, numEvents: Int, eventPaths: UnsafeMutableRawPointer,
-		eventFlags: UnsafePointer<FSEventStreamEventFlags>?, eventIds: UnsafePointer<FSEventStreamEventId>?) in
-		
-		let mySelf: SearchViewController = unsafeBitCast(contextInfo, to: SearchViewController.self)
-		mySelf.updateAppList()
-
-	}
+    let callback: FSEventStreamCallback = {
+        (streamRef, clientCallBackInfo, numEvents, eventPaths, eventFlags, eventIds) -> Void in
+        let mySelf: SearchViewController = unsafeBitCast(clientCallBackInfo, to: SearchViewController.self)
+        mySelf.updateAppList()
+    }
 	
     func initFileWatch(_ dirs: [String]) {
         let allocator: CFAllocator? = kCFAllocatorDefault
@@ -76,7 +73,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 		
 		let eventStream: FSEventStreamRef! = FSEventStreamCreate(
             allocator,
-            eventCallback,
+            callback,
             &context,
             dirs as CFArray,
             sinceWhen,
