@@ -1,7 +1,10 @@
+# Visual Fork
+
+This is a fork of dmenu-mac that adds in a preview of the selected app.
+
+----
 
 # dmenu-mac
-
-[![Build Status](https://travis-ci.org/fr0zn/dmenu-mac.svg?branch=master)](https://travis-ci.org/fr0zn/dmenu-mac)
 
 dmenu inspired application launcher.
 

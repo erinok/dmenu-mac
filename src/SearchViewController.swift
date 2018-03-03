@@ -13,9 +13,13 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     NSWindowDelegate, SettingsViewControllerDelegate {
     
     @IBOutlet fileprivate var searchText: NSTextField!
-    @IBOutlet fileprivate var resultsText: ResultsView!
+    @IBOutlet fileprivate var resultsView: ResultsView!
+    
     var settingsWindow = NSWindow()
     var hotkey: DDHotKey?
+    
+    var topHitWindow: NSWindow!
+    var topHitView: NSImageView!
     
     var appDirDict = [String: Bool]()
     var appList = [URL]()
@@ -47,6 +51,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
             ])
         
         configureGlobalShortcut()
+        createTopHitWindow();
     }
 	
     let callback: FSEventStreamCallback = {
@@ -127,8 +132,25 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         }
     }
     
+    func createTopHitWindow() {
+        let size: CGFloat = 384;
+        let ssize = NSScreen.main()!.frame.size;
+        let frame = NSRect(x: ssize.width/CGFloat(2) - size/CGFloat(2), y: ssize.height/CGFloat(2) - size/CGFloat(2), width: size, height: size)
+        
+        self.topHitWindow = NSWindow(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
+        self.topHitWindow.backgroundColor = NSColor.clear
+        self.topHitWindow.isOpaque = false
+        self.topHitWindow.orderFrontRegardless()
+        
+        self.topHitView = NSImageView(frame: NSRect(x: 0, y:0, width: size, height: size))
+        
+        self.topHitWindow.contentView?.addSubview(self.topHitView)
+    }
+    
     func resumeApp() {
         NSApplication.shared().activate(ignoringOtherApps: true)
+        topHitWindow.collectionBehavior = NSWindowCollectionBehavior.canJoinAllSpaces
+        topHitWindow.orderFrontRegardless()
         view.window?.collectionBehavior = NSWindowCollectionBehavior.canJoinAllSpaces
         view.window?.orderFrontRegardless()
         
@@ -160,49 +182,52 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     
     override func controlTextDidChange(_ obj: Notification) {
         let list = self.getFuzzyList()
-        
         if !list.isEmpty {
-            self.resultsText.list = list
+            self.resultsView.list = list
+            // update top hit display after a short delay, to avoid flickering through early possibilities
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: self.updateTopHit);
         } else {
-            self.resultsText.clear()
+            self.resultsView.clear()
+            self.updateTopHit()
         }
     }
     
     func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
         if commandSelector == #selector(moveLeft(_:)) {
-            self.resultsText.selectedAppIndex -= 1
+            self.resultsView.selectedAppIndex -= 1
+            self.updateTopHit()
             return true
         } else if commandSelector == #selector(moveRight(_:)) {
-            self.resultsText.selectedAppIndex += 1
+            self.resultsView.selectedAppIndex += 1
+            self.updateTopHit()
             return true
         } else if commandSelector == #selector(insertTab(_:)) {
             let list = getStartingBy(searchText.stringValue)
             if !list.isEmpty {
-                self.resultsText.list = list
+                self.resultsView.list = list
             } else {
-                self.resultsText.clear()
+                self.resultsView.clear()
             }
-            
+            self.updateTopHit()
             return true
         } else if commandSelector == #selector(insertNewline(_:)) {
             //open current selected app
-            if let app = resultsText.selectedApp {
+            if let app = resultsView.selectedApp {
                 NSWorkspace.shared().launchApplication(app.path)
             }
-            
             self.clearFields()
             return true
         } else if commandSelector == #selector(cancelOperation(_:)) {
             closeApp()
             return true
         }
-        
         return false
     }
     
     func clearFields() {
         self.searchText.stringValue = ""
-        self.resultsText.clear()
+        self.resultsView.clear()
+        self.topHitView.image = nil
     }
     
     func closeApp() {
@@ -242,6 +267,16 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         let resultsList = scoreDict
             .sorted(by: {$0.1 > $1.1}).map({$0.0})
         return resultsList
+    }
+    
+    func updateTopHit() {
+        if let app = resultsView.selectedApp {
+            let img = NSWorkspace.shared().icon(forFile: app.path)
+            img.size = NSSize(width: 512, height: 512)
+            topHitView.image = img
+        } else {
+            topHitView.image = nil
+        }
     }
     
     @IBAction func openSettings(_ sender: AnyObject) {
