@@ -25,6 +25,8 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     @objc var appDirDict = [String: Bool]()
     @objc var appList = [URL]()
     @objc var appNameList = [String]()
+	
+    var openDate = [URL: Double]() // app -> unix timestamp
     
     struct Shortcut {
         let keycode: UInt16
@@ -221,6 +223,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         } else if commandSelector == #selector(insertNewline(_:)) {
             //open current selected app
             if let app = resultsView.selectedApp {
+            	openDate[app] = NSDate().timeIntervalSince1970
                 NSWorkspace.shared.launchApplication(app.path)
             }
             self.clearFields()
@@ -271,9 +274,20 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
                 scoreDict[app] = score
             }
         }
-        
-        let resultsList = scoreDict
-            .sorted(by: {$0.1 > $1.1}).map({$0.0})
+		
+        // sort by most-recent-open date
+        let resultsList = scoreDict.sorted(by: {
+        	let t0 = openDate[$0.0] ?? 0
+        	let t1 = openDate[$1.0] ?? 0
+        	if t0 > t1 {
+        		return true
+			}
+			if t1 > t0 {
+				return false
+			}
+			// tie break on search score for never-opened items
+            return $0.1 > $1.1
+		}).map({$0.0})
         return resultsList
     }
     
