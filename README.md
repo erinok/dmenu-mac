@@ -2,10 +2,14 @@
 
 This fork makes the following changes:
 
-- Show a the icon of the top match
+- Show big icon of the top match in center of screen
 - Sort matches by most-recently-opened
 
+![preview](https://i.imgur.com/th6XbBV.jpg)
+
 ----
+
+# Original README
 
 # dmenu-mac
 
