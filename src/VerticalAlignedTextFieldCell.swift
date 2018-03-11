@@ -7,7 +7,7 @@
 import Cocoa
 
 class VerticalAlignedTextFieldCell: NSTextFieldCell {
-    var editingOrSelecting: Bool = false
+    @objc var editingOrSelecting: Bool = false
     
     override func drawingRect(forBounds theRect: NSRect) -> NSRect {
         var newRect = super.drawingRect(forBounds: theRect)

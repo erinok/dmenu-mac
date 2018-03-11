@@ -8,10 +8,10 @@ import Carbon
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, NSWindowDelegate {
-    var controllerWindow: NSWindowController? = nil
+    @objc var controllerWindow: NSWindowController? = nil
     
     func applicationDidFinishLaunching(_ aNotification: Notification) {
-        let sb = NSStoryboard(name: "Main", bundle: Bundle.main)
+        let sb = NSStoryboard(name: NSStoryboard.Name(rawValue: "Main"), bundle: Bundle.main)
         controllerWindow = sb.instantiateInitialController() as? NSWindowController
         controllerWindow?.window?.orderFrontRegardless()
     }

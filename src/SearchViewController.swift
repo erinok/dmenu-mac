@@ -15,16 +15,16 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     @IBOutlet fileprivate var searchText: NSTextField!
     @IBOutlet fileprivate var resultsView: ResultsView!
     
-    var settingsWindow = NSWindow()
-    var hotkey: DDHotKey?
+    @objc var settingsWindow = NSWindow()
+    @objc var hotkey: DDHotKey?
     
-    var topHitWindow: NSWindow!
-    var topHitView: NSImageView!
+    @objc var topHitWindow: NSWindow!
+    @objc var topHitView: NSImageView!
 	
-    var ignoreDirectories = [String: Bool]()
-    var appDirDict = [String: Bool]()
-    var appList = [URL]()
-    var appNameList = [String]()
+    @objc var ignoreDirectories = [String: Bool]()
+    @objc var appDirDict = [String: Bool]()
+    @objc var appList = [URL]()
+    @objc var appNameList = [String]()
     
     struct Shortcut {
         let keycode: UInt16
@@ -49,20 +49,20 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         UserDefaults.standard.register(defaults: [
             //cmd+Space is the default shortcut
             kDefaultsGlobalShortcutKeycode: kVK_Space,
-            kDefaultsGlobalShortcutModifiedFlags: NSEventModifierFlags.command.rawValue
+            kDefaultsGlobalShortcutModifiedFlags: NSEvent.ModifierFlags.command.rawValue
             ])
         
         configureGlobalShortcut()
         createTopHitWindow();
     }
 	
-    let callback: FSEventStreamCallback = {
+    @objc let callback: FSEventStreamCallback = {
         (streamRef, clientCallBackInfo, numEvents, eventPaths, eventFlags, eventIds) -> Void in
         let mySelf: SearchViewController = unsafeBitCast(clientCallBackInfo, to: SearchViewController.self)
         mySelf.updateAppList()
     }
 	
-    func initFileWatch(_ dirs: [String]) {
+    @objc func initFileWatch(_ dirs: [String]) {
         let allocator: CFAllocator? = kCFAllocatorDefault
         
         typealias FSEventStreamCallback = @convention(c) (ConstFSEventStreamRef, UnsafeMutableRawPointer, Int, UnsafeMutableRawPointer, UnsafePointer<FSEventStreamEventFlags>, UnsafePointer<FSEventStreamEventId>) -> Void
@@ -92,7 +92,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         FSEventStreamStart(eventStream)
     }
     
-    func updateAppList() {
+    @objc func updateAppList() {
         appList.removeAll()
         appNameList.removeAll()
         for dir in appDirDict.keys {
@@ -116,7 +116,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         return Shortcut(keycode: UInt16(keycode), modifierFlags: UInt(modifierFlags))
     }
     
-    func configureGlobalShortcut() {
+    @objc func configureGlobalShortcut() {
         let globalShortcut = getGlobalShortcut()
 
         if hotkey != nil {
@@ -134,12 +134,12 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         }
     }
     
-    func createTopHitWindow() {
+    @objc func createTopHitWindow() {
         let size: CGFloat = 384;
-        let ssize = NSScreen.main()!.frame.size;
+        let ssize = NSScreen.main!.frame.size;
         let frame = NSRect(x: ssize.width/CGFloat(2) - size/CGFloat(2), y: ssize.height/CGFloat(2) - size/CGFloat(2), width: size, height: size)
         
-        self.topHitWindow = NSWindow(contentRect: frame, styleMask: .borderless, backing: .buffered, defer: false)
+        self.topHitWindow = NSWindow(contentRect: frame, styleMask: NSWindow.StyleMask.borderless, backing: .buffered, defer: false)
         self.topHitWindow.backgroundColor = NSColor.clear
         self.topHitWindow.isOpaque = false
         self.topHitWindow.orderFrontRegardless()
@@ -149,18 +149,18 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         self.topHitWindow.contentView?.addSubview(self.topHitView)
     }
     
-    func resumeApp() {
-        NSApplication.shared().activate(ignoringOtherApps: true)
-        topHitWindow.collectionBehavior = NSWindowCollectionBehavior.canJoinAllSpaces
+    @objc func resumeApp() {
+        NSApplication.shared.activate(ignoringOtherApps: true)
+        topHitWindow.collectionBehavior = NSWindow.CollectionBehavior.canJoinAllSpaces
         topHitWindow.orderFrontRegardless()
-        view.window?.collectionBehavior = NSWindowCollectionBehavior.canJoinAllSpaces
+        view.window?.collectionBehavior = NSWindow.CollectionBehavior.canJoinAllSpaces
         view.window?.orderFrontRegardless()
         
         let controller = view.window as! SearchWindow;
         controller.updatePosition();
     }
     
-    func getAppList(_ appDir: URL, recursive: Bool = true) -> [URL] {
+    @objc func getAppList(_ appDir: URL, recursive: Bool = true) -> [URL] {
 		if ignoreDirectories[appDir.path] ?? false {
         	return [URL]()
 		}
@@ -221,7 +221,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         } else if commandSelector == #selector(insertNewline(_:)) {
             //open current selected app
             if let app = resultsView.selectedApp {
-                NSWorkspace.shared().launchApplication(app.path)
+                NSWorkspace.shared.launchApplication(app.path)
             }
             self.clearFields()
             return true
@@ -232,18 +232,18 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         return false
     }
     
-    func clearFields() {
+    @objc func clearFields() {
         self.searchText.stringValue = ""
         self.resultsView.clear()
         self.topHitView.image = nil
     }
     
-    func closeApp() {
+    @objc func closeApp() {
         clearFields()
-        NSApplication.shared().hide(nil)
+        NSApplication.shared.hide(nil)
     }
     
-    func getStartingBy(_ text: String) -> [URL] {
+    @objc func getStartingBy(_ text: String) -> [URL] {
         //todo turn this into a regex
         return appList.sorted(by: {
             //make it sorted
@@ -258,7 +258,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         })
     }
     
-    func getFuzzyList() -> [URL] {
+    @objc func getFuzzyList() -> [URL] {
         var scoreDict = [URL: Double]()
         
         for app in appList {
@@ -277,9 +277,9 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         return resultsList
     }
     
-    func updateTopHit() {
+    @objc func updateTopHit() {
         if let app = resultsView.selectedApp {
-            let img = NSWorkspace.shared().icon(forFile: app.path)
+            let img = NSWorkspace.shared.icon(forFile: app.path)
             img.size = NSSize(width: 512, height: 512)
             topHitView.image = img
         } else {
@@ -288,7 +288,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     }
     
     @IBAction func openSettings(_ sender: AnyObject) {
-        let sb = NSStoryboard(name: "Settings", bundle: Bundle.main)
+        let sb = NSStoryboard(name: NSStoryboard.Name(rawValue: "Settings"), bundle: Bundle.main)
         let settingsView = sb.instantiateInitialController() as? SettingsViewController
         settingsView?.delegate = self
         
@@ -301,14 +301,14 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         })
     }
     
-    func onSettingsApplied() {
+    @objc func onSettingsApplied() {
         view.window?.endSheet(settingsWindow)
 
         //reconfigure global shortcuts if changed
         configureGlobalShortcut()
     }
     
-    func onSettingsCanceled() {
+    @objc func onSettingsCanceled() {
         view.window?.endSheet(settingsWindow)
     }
 }

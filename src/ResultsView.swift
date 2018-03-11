@@ -6,11 +6,11 @@
 import Cocoa
 
 class ResultsView: NSView {
-    let rectFillPadding:CGFloat = 5
-    var _list = [URL]()
+    @objc let rectFillPadding:CGFloat = 5
+    @objc var _list = [URL]()
     
-    var _selectedAppIndex: Int = 0
-    var selectedAppIndex: Int {
+    @objc var _selectedAppIndex: Int = 0
+    @objc var selectedAppIndex: Int {
         get {
             return _selectedAppIndex
         }
@@ -24,7 +24,7 @@ class ResultsView: NSView {
         }
     }
     
-    var list: [URL] {
+    @objc var list: [URL] {
         get {
             return _list
         }
@@ -35,7 +35,7 @@ class ResultsView: NSView {
         }
     }
     
-    var selectedApp: URL? {
+    @objc var selectedApp: URL? {
         get {
             if _selectedAppIndex < 0 || _selectedAppIndex >= _list.count {
                 return nil
@@ -45,13 +45,13 @@ class ResultsView: NSView {
         }
     }
     
-    func clear() {
+    @objc func clear() {
         _list.removeAll()
         needsDisplay = true;
     }
     
     override func draw(_ dirtyRect: NSRect) {
-        let textFontAttributes = [String: AnyObject]()
+        let textFontAttributes = [NSAttributedStringKey: Any]()
         
         var textX = CGFloat(rectFillPadding)
         for i in 0 ..< list.count {
@@ -61,18 +61,18 @@ class ResultsView: NSView {
             
             if _selectedAppIndex == i {
                 NSColor.selectedTextBackgroundColor.setFill()
-                NSRectFill(NSRect(
+                NSRect(
                     x: textX - rectFillPadding,
                     y: textY - rectFillPadding,
                     width: size.width + rectFillPadding * 2,
-                    height: size.height + rectFillPadding * 2))
+                    height: size.height + rectFillPadding * 2).fill()
             }
             
             appName.draw(in: NSRect(
                 x: textX,
                 y: textY,
                 width: size.width,
-                height: size.height), withAttributes: [String: AnyObject]())
+                height: size.height), withAttributes: [NSAttributedStringKey: AnyObject]())
             
             textX += 10 + size.width;
             
