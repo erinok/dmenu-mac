@@ -25,6 +25,8 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 	@objc var appDirDict = [String: Bool]()
 	@objc var appList = [URL]()
 	@objc var appNameList = [String]()
+
+	var barAppList = [URL]()
 	
 	var openDate = [String: Double]() // app path -> unix timestamp
 	
@@ -40,11 +42,14 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 		let applicationDir = NSSearchPathForDirectoriesInDomains(
 			.applicationDirectory, .localDomainMask, true)[0];
 		
-		// appName to dir recursivity key/valye dict
+		// appName to dir recursivity key/value dict
 		appDirDict[applicationDir] = true
 		appDirDict["/System/Library/CoreServices/"] = false
 		ignoreDirectories["/System/Library/CoreServices"] = true
-		
+
+		if let openDate = UserDefaults.standard.dictionary(forKey: "openDate") as? [String:Double] {
+			self.openDate = openDate
+		}
 		initFileWatch(Array(appDirDict.keys))
 		updateAppList()
 		
@@ -56,10 +61,6 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 		
 		configureGlobalShortcut()
 		createTopHitWindow();
-		
-		if let od = UserDefaults.standard.dictionary(forKey: "openDate") as? [String:Double] {
-			openDate = od
-		}
 	}
 	
 	@objc let callback: FSEventStreamCallback = {
@@ -112,6 +113,12 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 			let appName = (app.deletingPathExtension().lastPathComponent)
 			appNameList.append(appName)
 		}
+		updateBarAppList()
+	}
+
+	private func updateBarAppList() {
+		let src = self.resultsView.list.count > 0 ? self.resultsView.list : self.appList;
+		barAppList = src.sorted(by: { (openDate[$0.path] ?? 0) > (openDate[$1.path] ?? 0) })
 	}
 	
 	func getGlobalShortcut() -> Shortcut {
@@ -204,6 +211,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 			self.resultsView.clear()
 			self.updateTopHit()
 		}
+		self.updateBarAppList()
 	}
 	
 	func control(_ control: NSControl, textView: NSTextView, doCommandBy commandSelector: Selector) -> Bool {
@@ -294,6 +302,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 			// tie break on search score for never-opened items
 			return $0.1 > $1.1
 		}).map({$0.0})
+		
 		return resultsList
 	}
 	
