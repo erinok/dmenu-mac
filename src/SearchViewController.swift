@@ -20,7 +20,8 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     
     var topHitWindow: NSWindow!
     var topHitView: NSImageView!
-    
+	
+    var ignoreDirectories = [String: Bool]()
     var appDirDict = [String: Bool]()
     var appList = [URL]()
     var appNameList = [String]()
@@ -40,6 +41,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         // appName to dir recursivity key/valye dict
         appDirDict[applicationDir] = true
         appDirDict["/System/Library/CoreServices/"] = false
+        ignoreDirectories["/System/Library/CoreServices"] = true
         
         initFileWatch(Array(appDirDict.keys))
         updateAppList()
@@ -159,9 +161,11 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
     }
     
     func getAppList(_ appDir: URL, recursive: Bool = true) -> [URL] {
+		if ignoreDirectories[appDir.path] ?? false {
+        	return [URL]()
+		}
         var list = [URL]()
         let fileManager = FileManager.default
-        
         do {
             let subs = try fileManager.contentsOfDirectory(atPath: appDir.path)
             
@@ -184,8 +188,12 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
         let list = self.getFuzzyList()
         if !list.isEmpty {
             self.resultsView.list = list
-            // update top hit display after a short delay, to avoid flickering through early possibilities
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: self.updateTopHit);
+            if false {
+                // update top hit display after a short delay, to avoid flickering through early possibilities
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.2, execute: self.updateTopHit);
+            } else {
+                self.updateTopHit()
+            }
         } else {
             self.resultsView.clear()
             self.updateTopHit()
