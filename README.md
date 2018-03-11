@@ -1,6 +1,9 @@
-# Visual Fork
+# Fork
 
-This is a fork of dmenu-mac that adds in a preview of the selected app.
+This fork makes the following changes:
+
+- Show a the icon of the top match
+- Sort matches by most-recently-opened
 
 ----
 
