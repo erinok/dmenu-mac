@@ -9,6 +9,14 @@ import Cocoa
 let kDefaultsGlobalShortcutKeycode = "kDefaultsGlobalShortcutKeycode"
 let kDefaultsGlobalShortcutModifiedFlags = "kDefaultsGlobalShortcutModifiedFlags"
 
+fileprivate extension NSTouchBar.CustomizationIdentifier {
+    static let openScrubber = NSTouchBar.CustomizationIdentifier("com.ezopen.scrubberBar")
+}
+
+fileprivate extension NSTouchBarItem.Identifier {
+    static let openScrubber = NSTouchBarItem.Identifier("com.ezopen.TouchBarItem.scrubber")
+}
+
 class SearchViewController: NSViewController, NSTextFieldDelegate,
 	NSWindowDelegate, SettingsViewControllerDelegate {
 	
@@ -61,6 +69,18 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 		
 		configureGlobalShortcut()
 		createTopHitWindow();
+	}
+
+	override func makeTouchBar() -> NSTouchBar? {
+        let touchBar = NSTouchBar()
+		touchBar.delegate = self
+		
+        touchBar.customizationIdentifier = .openScrubber
+        touchBar.defaultItemIdentifiers = [.openScrubber]
+        touchBar.customizationAllowedItemIdentifiers = [.openScrubber]
+        touchBar.principalItemIdentifier = .openScrubber
+		
+        return touchBar
 	}
 	
 	@objc let callback: FSEventStreamCallback = {
@@ -347,3 +367,57 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 
 }
 
+// MARK: - NSTouchBarDelegate
+
+extension SearchViewController: NSTouchBarDelegate {
+    
+    func touchBar(_ touchBar: NSTouchBar, makeItemForIdentifier identifier: NSTouchBarItem.Identifier) -> NSTouchBarItem? {
+		let scrubberItem: NSCustomTouchBarItem
+		return nil
+
+    
+        // switch identifier {
+        // case NSTouchBarItem.Identifier.textScrubber:
+        //     scrubberItem = TextScrubberBarItemSample(identifier: identifier)
+        //     scrubberItem.customizationLabel = NSLocalizedString("Text Scrubber", comment:"")
+        //     (scrubberItem as? TextScrubberBarItemSample)?.scrubberItemWidth = spacingSlider.integerValue
+            
+        // case NSTouchBarItem.Identifier.imageScrubber:
+        //     scrubberItem = ImageScrubberBarItemSample(identifier: identifier)
+        //     scrubberItem.customizationLabel = NSLocalizedString("Image Scrubber", comment:"")
+        //     (scrubberItem as? ImageScrubberBarItemSample)?.scrubberItemWidth = spacingSlider.integerValue
+            
+        // case NSTouchBarItem.Identifier.iconTextScrubber:
+        //     scrubberItem = IconTextScrubberBarItemSample(identifier: identifier)
+        //     scrubberItem.customizationLabel = NSLocalizedString("IconText Scrubber", comment:"")
+            
+        // default:
+        //     return nil
+        // }
+        
+		// guard let scrubber = scrubberItem.view as? NSScrubber else { return nil }
+        
+        // scrubber.mode = selectedMode
+        // scrubber.showsArrowButtons = showsArrows.state == NSControl.StateValue.on
+		// scrubber.selectionBackgroundStyle = selectedSelectionBackgroundStyle
+        // scrubber.selectionOverlayStyle = selectedSelectionOverlayStyle
+        // scrubber.scrubberLayout = selectedLayout
+        // if useBackgroundColor.state == NSControl.StateValue.on {
+        //     scrubber.backgroundColor = backgroundColorWell.color
+        // }
+        
+        // if useBackgroundView.state == NSControl.StateValue.on {
+        //     scrubber.backgroundView = CustomBackgroundView()
+        // }
+        
+        // // Set the scrubber's width to be 400.
+        // let viewBindings: [String: NSView] = ["scrubber": scrubber]
+        // let hconstraints = NSLayoutConstraint.constraints(withVisualFormat: "H:[scrubber(400)]",
+        //                                                   options: [],
+        //                                                   metrics: nil,
+        //                                                   views: viewBindings)
+        // NSLayoutConstraint.activate(hconstraints)
+        
+        // return scrubberItem
+    }
+}
