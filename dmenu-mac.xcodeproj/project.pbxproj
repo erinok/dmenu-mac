@@ -22,6 +22,8 @@
 		7F5D0E271CACCD0100268983 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F5D0E251CACCD0100268983 /* SettingsViewController.swift */; };
 		7F5D0E2C1CACCDD400268983 /* Empty.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F5D0E281CACCDD400268983 /* Empty.storyboard */; };
 		7F5D0E2D1CACCDD400268983 /* Settings.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7F5D0E2A1CACCDD400268983 /* Settings.storyboard */; };
+		803E26092055EF36001D1D44 /* ImageScrubberBarItemSample.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803E26082055EF36001D1D44 /* ImageScrubberBarItemSample.swift */; };
+		803E260B2055EF4F001D1D44 /* ThumbnailItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 803E260A2055EF4F001D1D44 /* ThumbnailItemView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +48,8 @@
 		7F5D0E291CACCDD400268983 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = src/Base.lproj/Empty.storyboard; sourceTree = "<group>"; };
 		7F5D0E2B1CACCDD400268983 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = src/Base.lproj/Settings.storyboard; sourceTree = "<group>"; };
 		7FE8A6481C717481000A2C4C /* dmenu-mac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "dmenu-mac.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		803E26082055EF36001D1D44 /* ImageScrubberBarItemSample.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageScrubberBarItemSample.swift; sourceTree = "<group>"; };
+		803E260A2055EF4F001D1D44 /* ThumbnailItemView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ThumbnailItemView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +78,8 @@
 				7F3278ED1C71C9CE00AFB227 /* SearchWindow.swift */,
 				7F5D0E251CACCD0100268983 /* SettingsViewController.swift */,
 				7F3278FF1C71D39800AFB227 /* VerticalAlignedTextFieldCell.swift */,
+				803E26082055EF36001D1D44 /* ImageScrubberBarItemSample.swift */,
+				803E260A2055EF4F001D1D44 /* ThumbnailItemView.swift */,
 			);
 			name = "dmenu-mac";
 			sourceTree = "<group>";
@@ -201,9 +207,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				803E26092055EF36001D1D44 /* ImageScrubberBarItemSample.swift in Sources */,
 				7F3279001C71D39800AFB227 /* VerticalAlignedTextFieldCell.swift in Sources */,
 				7F5D0E261CACCD0100268983 /* ResultsView.swift in Sources */,
 				7F3278F71C71C9CE00AFB227 /* SearchViewController.swift in Sources */,
+				803E260B2055EF4F001D1D44 /* ThumbnailItemView.swift in Sources */,
 				7F5D0E271CACCD0100268983 /* SettingsViewController.swift in Sources */,
 				7F32790C1C71DF2300AFB227 /* FuzzySearch.swift in Sources */,
 				7F32790A1C71DF2300AFB227 /* DDHotKeyTextField.m in Sources */,
