@@ -29,9 +29,10 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 	
 	@objc var topHitWindow: NSWindow!
 	@objc var topHitView: NSImageView!
+
+	var appDirectories: Set<URL> = []
+	var ignoreDirectories: Set<URL> = []
 	
-	@objc var ignoreDirectories = [String: Bool]()
-	@objc var appDirDict = [String: Bool]()
 	@objc var appList = [URL]()
 	@objc var appNameList = [String]()
 
@@ -47,27 +48,21 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		searchText.delegate = self;
-		
-		let applicationDir = NSSearchPathForDirectoriesInDomains(
-			.applicationDirectory, .localDomainMask, true)[0];
-		
-		// appName to dir recursivity key/value dict
-		appDirDict[applicationDir] = true
-		appDirDict["/System/Library/CoreServices/"] = false
-		ignoreDirectories["/System/Library/CoreServices"] = true
-
+		for d in NSSearchPathForDirectoriesInDomains(.applicationDirectory, .allDomainsMask, true) {
+			let d = URL(fileURLWithPath: d)
+			appDirectories.insert(d)
+		}
+		ignoreDirectories.insert(URL(fileURLWithPath: "/System/Library/CoreServices"))
 		if let openDate = UserDefaults.standard.dictionary(forKey: "openDate") as? [String:Double] {
 			self.openDate = openDate
 		}
-		initFileWatch(Array(appDirDict.keys))
+		initFileWatch(Array(appDirectories))
 		updateAppList()
-		
 		UserDefaults.standard.register(defaults: [
 			//cmd+Space is the default shortcut
 			kDefaultsGlobalShortcutKeycode: kVK_Space,
 			kDefaultsGlobalShortcutModifiedFlags: NSEvent.ModifierFlags.command.rawValue
-			])
-		
+		])
 		configureGlobalShortcut()
 		createTopHitWindow();
 	}
@@ -91,7 +86,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 		mySelf.updateAppList()
 	}
 	
-	@objc func initFileWatch(_ dirs: [String]) {
+	@objc func initFileWatch(_ dirs: [URL]) {
 		let allocator: CFAllocator? = kCFAllocatorDefault
 		
 		typealias FSEventStreamCallback = @convention(c) (ConstFSEventStreamRef, UnsafeMutableRawPointer, Int, UnsafeMutableRawPointer, UnsafePointer<FSEventStreamEventFlags>, UnsafePointer<FSEventStreamEventId>) -> Void
@@ -111,7 +106,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 			allocator,
 			callback,
 			&context,
-			dirs as CFArray,
+			dirs.map { $0.path } as CFArray,
 			sinceWhen,
 			latency,
 			flags
@@ -124,17 +119,9 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 	@objc func updateAppList() {
 		appList.removeAll()
 		appNameList.removeAll()
-		for dir in appDirDict.keys {
-			appList.append(
-				contentsOf: getAppList(
-					URL(fileURLWithPath: dir, isDirectory: true),
-					recursive: appDirDict[dir]!))
-		}
+		appList = appDirectories.flatMap { appsInDirectory($0) }
+		appNameList = appList.map { $0.deletingPathExtension().lastPathComponent }
 		
-		for app in appList {
-			let appName = (app.deletingPathExtension().lastPathComponent)
-			appNameList.append(appName)
-		}
 		updateBarAppList()
 	}
 
@@ -195,28 +182,29 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 		controller.updatePosition();
 	}
 	
-	@objc func getAppList(_ appDir: URL, recursive: Bool = true) -> [URL] {
-		if ignoreDirectories[appDir.path] ?? false {
-			return [URL]()
+	@objc func appsInDirectory(_ d: URL) -> [URL] {
+		if ignoreDirectories.contains(d) {
+			return []
 		}
-		var list = [URL]()
-		let fileManager = FileManager.default
-		do {
-			let subs = try fileManager.contentsOfDirectory(atPath: appDir.path)
-			
-			for sub in subs {
-				let dir = appDir.appendingPathComponent(sub)
-				
-				if dir.pathExtension == "app" {
-					list.append(dir);
-				} else if dir.hasDirectoryPath && recursive {
-					list.append(contentsOf: self.getAppList(dir))
-				}
+		// print("app directory:", d)
+		guard let it = FileManager.default.enumerator(atPath: d.path) else {
+			print("error: cannot get apps in directory: ", d)
+			return []
+		}
+		var apps = [URL]()
+		while let p = it.nextObject() as? String {
+			let f = d.appendingPathComponent(p)
+			if f.deletingLastPathComponent().pathExtension == "app" {
+				// don't peek inside the contents of the .app itself.
+				// also, contrary to its name, this function skips the *current* folder.
+				it.skipDescendants()
+				continue
 			}
-		} catch {
-			print(error)
+			if f.pathExtension == "app" {
+				apps.append(f)
+			}
 		}
-		return list
+		return apps
 	}
 	
 	override func controlTextDidChange(_ obj: Notification) {
