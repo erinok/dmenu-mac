@@ -2,3 +2,5 @@ xcuserdata/
 /*.app
 /*.xcarchive
 /*.zip
+# fucking dsstore!!!
+.DS_Store
