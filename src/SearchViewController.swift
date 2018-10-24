@@ -52,6 +52,7 @@ class SearchViewController: NSViewController, NSTextFieldDelegate,
 			let d = URL(fileURLWithPath: d)
 			appDirectories.insert(d)
 		}
+        appDirectories.insert(URL(fileURLWithPath: "/System/Library/CoreServices/Applications/"))
 		ignoreDirectories.insert(URL(fileURLWithPath: "/System/Library/CoreServices"))
 		if let openDate = UserDefaults.standard.dictionary(forKey: "openDate") as? [String:Double] {
 			self.openDate = openDate
